@@ -273,6 +273,24 @@ void create_quad()
     render_pattern_to_texture(tex, 0);
 }
 
+void update_quad()
+{
+    static float t = 0; t += 16;
+    float x = -1.0f+sin(t*2.0f*3.141592f/2000.0f);
+    float verts[] = {
+    //   x   y  z   u  v
+         x, -1, 0,  0, 1,
+        -1,  1, 0,  0, 0,
+         1, -1, 0,  1, 1,
+         1,  1, 0,  1, 0
+    };
+
+    void *where_to_copy_to;
+    vb->Lock(0, 0, &where_to_copy_to, 0);
+    memcpy(where_to_copy_to, verts, 5 * 4 * sizeof(float));
+    vb->Unlock();
+}
+
 void render()
 {
     device->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,150,200), 1.0f, 0);
@@ -296,8 +314,10 @@ DWORD WINAPI RunMainLoop( LPVOID lpParam )
 {
     while (running)
     {
+        update_quad();
         render_pattern_to_texture(tex, 16);
         render();
+        Sleep(16);
     }
     return 0;
 }
@@ -367,10 +387,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
-        // render_pattern_to_texture(tex, 16);
-        // render();
-
         Sleep(16);
     }
 
