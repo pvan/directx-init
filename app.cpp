@@ -169,7 +169,7 @@ bool init_directx(HWND win, int w, int h)
         D3DADAPTER_DEFAULT,
         D3DDEVTYPE_HAL,
         win,
-        D3DCREATE_HARDWARE_VERTEXPROCESSING,
+        D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED, // supposedly multithread degrades perf
         &params,
         &device);
 
@@ -289,7 +289,18 @@ void render()
     device->Present(0, 0, 0, 0);
 }
 
+
 bool running = true;
+
+DWORD WINAPI RunMainLoop( LPVOID lpParam )
+{
+    while (running)
+    {
+        render_pattern_to_texture(tex, 16);
+        render();
+    }
+    return 0;
+}
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -345,6 +356,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     create_quad();
 
 
+    CreateThread(0, 0, RunMainLoop, 0, 0, 0);
+
+
     while(running)
     {
         MSG msg;
@@ -354,8 +368,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             DispatchMessage(&msg);
         }
 
-        render_pattern_to_texture(tex, 16);
-        render();
+        // render_pattern_to_texture(tex, 16);
+        // render();
 
         Sleep(16);
     }
