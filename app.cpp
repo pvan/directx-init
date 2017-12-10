@@ -101,7 +101,7 @@ char *vertex_shader = MULTILINE_STRING
     VOUT vs_main(in VIN In)
     {
         VOUT Out;
-        Out.Position = (In.Position - float4(0.5,0.5,0,0)) * float4(2,-2,1,1); // to ndc
+        Out.Position = In.Position;
         Out.Texture  = In.Texture;
         return Out;
     }
@@ -234,10 +234,10 @@ void create_quad()
 {
     float verts[] = {
     //   x   y  z   u  v
-        -1, -1, 0,  0, 0,
-         1, -1, 0,  1, 0,
-        -1,  1, 0,  0, 1,
-         1,  1, 0,  1, 1
+        -1, -1, 0,  0, 1,
+        -1,  1, 0,  0, 0,
+         1, -1, 0,  1, 1,
+         1,  1, 0,  1, 0
     };
     HRESULT res = device->CreateVertexBuffer(5 * 4 * sizeof(float), 0, 0, D3DPOOL_DEFAULT, &vb, 0);
     if (res != D3D_OK) MessageBox(0,"error creating vb", 0, 0);
@@ -257,7 +257,7 @@ void create_quad()
             D3DDECLUSAGE_POSITION, 0
         },
         {
-            0, 0,
+            0, 3*sizeof(float),
             D3DDECLTYPE_FLOAT2,
             D3DDECLMETHOD_DEFAULT,
             D3DDECLUSAGE_TEXCOORD, 0
